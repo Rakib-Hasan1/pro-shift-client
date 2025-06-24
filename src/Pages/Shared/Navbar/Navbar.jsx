@@ -1,21 +1,48 @@
 import React from "react";
 import { Link, NavLink } from "react-router";
 import Logo from "../ZapShiftLogo/Logo";
+import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../Hooks/useAuth";
 
 const Navbar = () => {
+  const { user, logoutUser } = useAuth();
+
+  const handleLogout = () => {
+    logoutUser()
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const NavLinks = (
     <>
       <li>
         <NavLink to="/">Home</NavLink>
       </li>
       <li>
+        <NavLink to="/sendParcel">Send A Parcel</NavLink>
+      </li>
+      <li>
+        <NavLink to="/coverage">Coverage</NavLink>
+      </li>
+      <li>
         <NavLink to="/about">About Us</NavLink>
       </li>
+      {user && (
+        <>
+          <li>
+            <NavLink to="/dashboard">Dashboard</NavLink>
+          </li>
+        </>
+      )}
     </>
   );
 
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-100 shadow-sm rounded-md px-5">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -42,15 +69,22 @@ const Navbar = () => {
             {NavLinks}
           </ul>
         </div>
-        <Link to='/'>
-          <Logo></Logo>
-        </Link>
+
+        <Logo></Logo>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{NavLinks}</ul>
       </div>
       <div className="navbar-end">
-        <a className="btn">Button</a>
+        {user ? (
+          <button onClick={handleLogout} className="btn">
+            Logout
+          </button>
+        ) : (
+          <Link to="/login">
+            <button className="btn">Login</button>
+          </Link>
+        )}
       </div>
     </div>
   );
