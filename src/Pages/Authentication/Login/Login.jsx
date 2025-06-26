@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import SocialLogin from "../../Shared/ZapShiftLogo/SocialLogin/SocialLogin";
 import useAuth from "../../../hooks/useAuth";
 
@@ -13,10 +13,15 @@ const Login = () => {
 
   const { signInUser } = useAuth();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/";
+
   const onSubmit = (data) => {
     signInUser(data.email, data.password)
       .then((result) => {
         console.log(result.user);
+        navigate(from);
       })
       .catch((error) => {
         console.log(error);
