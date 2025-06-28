@@ -1,11 +1,19 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router";
 import Logo from "../Pages/Shared/ZapShiftLogo/Logo";
-import { FaBoxOpen, FaHome, FaMoneyCheckAlt, FaSearchLocation, FaUserEdit } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaHome,
+  FaMoneyCheckAlt,
+  FaSearchLocation,
+  FaUserCheck,
+  FaUserClock,
+  FaUserEdit,
+} from "react-icons/fa";
 
 const DashboardLayout = () => {
   return (
-    <div className="">
+    <div>
       <div className="drawer lg:drawer-open bg-base-300">
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
@@ -77,6 +85,20 @@ const DashboardLayout = () => {
               <NavLink to="/dashboard/profile">
                 <FaUserEdit className="inline-block mr-2" />
                 Update Profile
+              </NavLink>
+            </li>
+
+            {/* riders link */}
+            <li>
+              <NavLink to="/dashboard/active-riders">
+                <FaUserCheck className="inline-block mr-2" />
+                Active Riders
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/dashboard/pending-riders">
+                <FaUserClock className="inline-block mr-2" />
+                Pending Riders
               </NavLink>
             </li>
           </ul>

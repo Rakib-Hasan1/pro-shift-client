@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../../Hooks/useAuth";
 import { Link } from "react-router";
 import SocialLogin from "../../Shared/ZapShiftLogo/SocialLogin/SocialLogin";
+import axios from "axios";
+import useAxios from "../../../Hooks/useAxios";
 
 const Register = () => {
   const {
@@ -11,16 +13,56 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
-  const { createUser } = useAuth();
+  const { createUser, updateUserProfile } = useAuth();
+  const axiosInstance = useAxios();
+
+  const [profilePic, setProfilePic] = useState("");
 
   const onSubmit = (data) => {
-    createUser(data.email, data.password)
-      .then((result) => {
-        console.log(result.user);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    createUser(data.email, data.password).then(async (result) => {
+      console.log(result.user);
+      // update user to db
+      const userInfo = {
+        email: data?.email,
+
+        // default role
+        role: "user",
+        created_at: new Date().toISOString(),
+        last_log_in: new Date().toISOString(),
+      };
+
+      const userRes = await axiosInstance.post("/users", userInfo);
+      console.log(userRes.data);
+
+      // update user profile in FB
+      const userProfile = {
+        displayName: data?.name,
+        photoURL: profilePic,
+      };
+      updateUserProfile(userProfile)
+        .then(() => {
+          console.log("Profile updated!");
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  };
+
+  const handleImageUpload = async (e) => {
+    const image = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("image", image);
+    const imageURL = `https://api.imgbb.com/1/upload?key=${
+      import.meta.env.VITE_image_upload_key
+    }`;
+    const res = await axios.post(imageURL, formData);
+
+    setProfilePic(res?.data?.data.url);
   };
 
   return (
@@ -30,6 +72,30 @@ const Register = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <fieldset className="fieldset">
               <h1 className="text-5xl font-bold">Create an account!</h1>
+              <label className="font-semibold text-xl mb-2">
+                Register with Profast
+              </label>
+
+              <label className="label">Upload your Image</label>
+              <input
+                onChange={handleImageUpload}
+                type="file"
+                className="file-input w-full"
+              />
+
+              {/* name field */}
+              <label className="label">Your Name</label>
+              <input
+                type="text"
+                {...register("name", { required: true })}
+                className="input w-full"
+                placeholder="Your Name"
+              />
+              {errors.email?.type === "required" && (
+                <p className="text-red-500">Name is required</p>
+              )}
+
+              {/* email field */}
               <label className="label">Email</label>
               <input
                 type="email"
@@ -40,6 +106,8 @@ const Register = () => {
               {errors.email?.type === "required" && (
                 <p className="text-red-500">Email is required</p>
               )}
+
+              {/* password field */}
               <label className="label">Password</label>
               <input
                 type="password"
