@@ -73,7 +73,7 @@ const Login = () => {
 
             <p className="text-lg">
               Don't have in ProShift account?
-              <Link
+              <Link state={{from}}
                 to="/register"
                 className="text-primary pl-2 hover:underline"
               >

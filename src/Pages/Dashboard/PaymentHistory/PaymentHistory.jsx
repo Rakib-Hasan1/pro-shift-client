@@ -1,8 +1,8 @@
 import React from "react";
-import useAuth from "../../../hooks/useAuth";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import LoadingEffect from "../../Shared/LoadingEffect/LoadingEffect";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import useAuth from "../../../Hooks/useAuth";
 
 const PaymentHistory = () => {
   const { user } = useAuth();
@@ -12,7 +12,7 @@ const PaymentHistory = () => {
   const formatDate = (iso) => new Date(iso).toLocaleString();
 
   const { isPending, data: payments = [] } = useQuery({
-    queryKey: ["payments", user.email],
+    queryKey: ["payments", user?.email],
     queryFn: async () => {
       const res = await axiosSecure.get(`/payments?email=${user.email}`);
       return res.data;

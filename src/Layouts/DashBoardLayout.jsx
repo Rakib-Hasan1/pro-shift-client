@@ -5,13 +5,19 @@ import {
   FaBoxOpen,
   FaHome,
   FaMoneyCheckAlt,
+  FaMotorcycle,
   FaSearchLocation,
   FaUserCheck,
   FaUserClock,
   FaUserEdit,
+  FaUserShield,
 } from "react-icons/fa";
+import useUserRole from "../Hooks/useUserRole";
 
 const DashboardLayout = () => {
+  const { role, roleLoading } = useUserRole();
+  console.log(role);
+
   return (
     <div>
       <div className="drawer lg:drawer-open bg-base-300">
@@ -89,18 +95,35 @@ const DashboardLayout = () => {
             </li>
 
             {/* riders link */}
-            <li>
-              <NavLink to="/dashboard/active-riders">
-                <FaUserCheck className="inline-block mr-2" />
-                Active Riders
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/pending-riders">
-                <FaUserClock className="inline-block mr-2" />
-                Pending Riders
-              </NavLink>
-            </li>
+            {!roleLoading && role === "admin" && (
+              <>
+                <li>
+                  <NavLink to="/dashboard/assign-rider">
+                    <FaMotorcycle className="inline-block mr-2" />
+                    Assign Rider
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/active-riders">
+                    <FaUserCheck className="inline-block mr-2" />
+                    Active Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/pending-riders">
+                    <FaUserClock className="inline-block mr-2" />
+                    Pending Riders
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink to="/dashboard/makeAdmin">
+                    <FaUserShield className="inline-block mr-2" />
+                    Make Admin
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
