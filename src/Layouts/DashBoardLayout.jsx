@@ -3,14 +3,17 @@ import { NavLink, Outlet } from "react-router";
 import Logo from "../Pages/Shared/ZapShiftLogo/Logo";
 import {
   FaBoxOpen,
+  FaCheckCircle,
   FaHome,
   FaMoneyCheckAlt,
   FaMotorcycle,
   FaSearchLocation,
+  FaTasks,
   FaUserCheck,
   FaUserClock,
   FaUserEdit,
   FaUserShield,
+  FaWallet,
 } from "react-icons/fa";
 import useUserRole from "../Hooks/useUserRole";
 
@@ -93,8 +96,33 @@ const DashboardLayout = () => {
                 Update Profile
               </NavLink>
             </li>
+            {/* Rider link */}
 
-            {/* riders link */}
+            {!roleLoading && role === "rider" && (
+              <>
+                <li>
+                  <NavLink to="/dashboard/pending-deliveries">
+                    <FaTasks className="inline-block mr-2" />
+                    Pending Deliveries
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink to="/dashboard/completed-deliveries">
+                    <FaCheckCircle className="inline-block mr-2" />
+                    Completed Deliveries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/my-earnings">
+                    <FaWallet className="inline-block mr-2" />
+                    My Earnings
+                  </NavLink>
+                </li>
+              </>
+            )}
+
+            {/* Admin link */}
             {!roleLoading && role === "admin" && (
               <>
                 <li>

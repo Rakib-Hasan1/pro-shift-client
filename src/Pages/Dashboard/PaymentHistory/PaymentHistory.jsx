@@ -29,10 +29,10 @@ const PaymentHistory = () => {
         <table className="table table-zebra w-full">
           <thead className="bg-base-200 text-base font-semibold">
             <tr>
-              <th>#</th>
+              <th>No.</th>
               <th>Parcel ID</th>
               <th>Amount</th>
-              <th>Transaction</th>
+              <th>Transaction ID</th>
               <th>Paid At</th>
             </tr>
           </thead>

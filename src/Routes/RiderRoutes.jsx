@@ -1,10 +1,9 @@
-import React, { Children } from "react";
-import { Navigate } from "react-router";
-import useAuth from "../Hooks/useAuth";
+import React from "react";
+import useAuth from "../hooks/useAuth";
 import useUserRole from "../Hooks/useUserRole";
 import LoadingEffect from "../Pages/Shared/LoadingEffect/LoadingEffect";
 
-const AdminRoute = ({ children }) => {
+const RiderRoutes = ({ children }) => {
   const { user, loading } = useAuth();
   const { role, roleLoading } = useUserRole();
 
@@ -12,7 +11,7 @@ const AdminRoute = ({ children }) => {
     return <LoadingEffect></LoadingEffect>;
   }
 
-  if (!user || role !== "admin") {
+  if (!user || role !== "rider") {
     return (
       <Navigate state={{ from: location.pathname }} to="/forbidden"></Navigate>
     );
@@ -21,4 +20,4 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
-export default AdminRoute;
+export default RiderRoutes;

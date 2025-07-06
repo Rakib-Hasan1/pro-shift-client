@@ -6,6 +6,7 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
 import LoadingEffect from "../../Shared/LoadingEffect/LoadingEffect";
+import useTrackingLogger from "../../../Hooks/UseTrackingLogger";
 
 const PaymentForm = () => {
   const stripe = useStripe();
@@ -13,9 +14,11 @@ const PaymentForm = () => {
   const { user } = useAuth();
   const { parcelId } = useParams();
   const axiosSecure = useAxiosSecure();
+  const { logTracking } = useTrackingLogger();
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // added loading state
 
   const { isPending, data: parcelInfo = {} } = useQuery({
     queryKey: ["parcels", parcelId],
@@ -24,38 +27,38 @@ const PaymentForm = () => {
       return res.data;
     },
   });
+
   if (isPending) {
-    return <LoadingEffect></LoadingEffect>;
+    return <LoadingEffect />;
   }
 
-  console.log(parcelInfo);
   const amount = parcelInfo.cost;
   const amountInCents = amount * 100;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
-      return;
-    }
+    if (!stripe || !elements) return;
 
     const card = elements.getElement(CardElement);
+    if (!card) return;
 
-    if (!card) {
-      return;
-    }
+    setLoading(true); // Start loading to disable button and show spinner
+    setError(""); // Clear previous error
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card,
-    });
+    try {
+      const { error: cardError, paymentMethod } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card,
+        });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setError("");
-      console.log("payment method", paymentMethod);
-      // payment intend
+      if (cardError) {
+        setError(cardError.message);
+        setLoading(false); // Stop loading on error
+        return;
+      }
+
       const res = await axiosSecure.post("/create-payment-intent", {
         amountInCents,
         parcelId,
@@ -63,7 +66,6 @@ const PaymentForm = () => {
 
       const clientSecret = res.data.clientSecret;
 
-      // confirm payment
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
@@ -76,37 +78,45 @@ const PaymentForm = () => {
 
       if (result.error) {
         setError(result.error.message);
-      } else {
-        setError("");
-        if (result.paymentIntent.status === "succeeded") {
-          // console.log("payment succeded");
+        setLoading(false); // Stop loading on error
+        return;
+      }
 
-          const transactionId = result?.paymentIntent.id;
-          const paymentData = {
-            parcelId,
-            email: user?.email,
-            amount,
-            transactionId: transactionId,
-            paymentMethod: result?.paymentIntent.payment_method_types,
-          };
-          const paymentRes = await axiosSecure.post("/payments", paymentData);
-          if (paymentRes.data.insertedId) {
-            // ✅ Show SweetAlert with transaction ID
-            await Swal.fire({
-              icon: "success",
-              title: "Payment Successful!",
-              html: `<strong>Transaction ID:</strong> <code>${transactionId}</code>`,
-              confirmButtonText: "Go to My Parcels",
-            });
+      if (result.paymentIntent.status === "succeeded") {
+        const transactionId = result?.paymentIntent.id;
 
-            // ✅ Redirect to /myParcels
+        const paymentData = {
+          parcelId,
+          email: user?.email,
+          amount,
+          transactionId: transactionId,
+          paymentMethod: result?.paymentIntent.payment_method_types,
+        };
+
+        const paymentRes = await axiosSecure.post("/payments", paymentData);
+
+        if (paymentRes.data.insertedId) {
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Successful!",
+            html: `<strong>Transaction ID:</strong> <code>${transactionId}</code>`,
+            confirmButtonText: "Go to My Parcels",
+          });
+
+          await logTracking({
+            tracking_id: parcelInfo.tracking_id,
+            status: "payment_done",
+            details: `paid by ${user.displayName}`,
+            updated_by: user.email,
+          }),
             navigate("/dashboard/myParcels");
-          }
         }
       }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false); // Always stop loading at the end
     }
-
-    // console.log("res from intend", res);
   };
 
   return (
@@ -115,14 +125,20 @@ const PaymentForm = () => {
         onSubmit={handleSubmit}
         className="space-y-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md mx-auto"
       >
-        <CardElement className="p-2 border rounded"></CardElement>
+        <CardElement className="p-2 border rounded" />
         {error && <p className="text-red-500">{error}</p>}
+
+        {/* Updated Button */}
         <button
           type="submit"
-          disabled={!stripe}
+          disabled={!stripe || loading} // disable button if loading
           className="btn btn-primary text-black w-full"
         >
-          Pay ${amount}
+          {loading ? (
+            <span className="loading loading-spinner loading-sm"></span> // loading animation
+          ) : (
+            `Pay $${amount}`
+          )}
         </button>
       </form>
     </div>
