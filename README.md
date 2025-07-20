@@ -2,6 +2,11 @@
 
 **Live Site:** [https://zap-shift-ee5f9.web.app](https://zap-shift-ee5f9.web.app)
 
+*Want to check this application?
+Here's admin login info
+email: rose@lilly.com
+pass: 1234aA@*
+
 ProShift is a modern **Parcel Delivery Web Application** that allows users to easily book, manage, and track their parcel deliveries. It provides a seamless experience for both customers and delivery staff through role-based dashboards, real-time updates, and smooth delivery workflow management.
 
 ---
