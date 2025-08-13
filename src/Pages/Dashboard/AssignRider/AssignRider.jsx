@@ -88,7 +88,7 @@ const AssignRider = () => {
       <h2 className="text-2xl font-bold mb-4">Assign Rider to Parcels</h2>
 
       {isLoading ? (
-        <p>{<LoadingEffect></LoadingEffect>}</p>
+        <div>{<LoadingEffect></LoadingEffect>}</div>
       ) : parcels.length === 0 ? (
         <p className="text-gray-500">No parcels available for assignment.</p>
       ) : (

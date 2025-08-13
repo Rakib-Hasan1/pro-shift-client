@@ -17,7 +17,7 @@ const BeMerchant = () => {
               with 100% safety of your product. Pathao courier delivers your
               parcels in every corner of Bangladesh right on time.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col lg:flex-row gap-3">
               <button className="btn bg-lime-400 border-none rounded-full text-black shadow-none font-bold text-lg p-6">
                 Become a Merchant
               </button>
