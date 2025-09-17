@@ -14,7 +14,7 @@ const BeMerchant = () => {
             </h1>
             <p className="py-6 text-white">
               We offer the lowest delivery charge with the highest value along
-              with 100% safety of your product. Pathao courier delivers your
+              with 100% safety of your product. Profast courier delivers your
               parcels in every corner of Bangladesh right on time.
             </p>
             <div className="flex flex-col lg:flex-row gap-3">
